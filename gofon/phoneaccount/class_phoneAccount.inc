@@ -1867,8 +1867,8 @@ class phoneAccount extends plugin
                       array(
                           "name"          => "delimiter",
                           "type"          => "string",
-                          "default"       => "|",
-                          "description"   => _("The delimiter to use for realtime-extension parameters, default is |, but never version of asterisk require ,"),
+                          "default"       => ",",
+                          "description"   => _("The delimiter to use for realtime-extension parameters, default is ',' older versions requires '|' !"),
                           "check"         => "",
                           "migrate"       => "",
                           "group"         => "asterisk",
