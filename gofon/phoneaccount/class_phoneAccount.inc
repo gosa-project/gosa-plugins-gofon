@@ -377,10 +377,16 @@ class phoneAccount extends plugin
                     $this->goFonPINVoice = $vp['password'];
                 }
                 if((isset($vp['context']))&&(!empty($vp['context']))){
-                    $this->context = $vp['context'];
+					$this->context = $vp['context'];
+					if(!in_array_strict($this->context, $this->sip_contexts)){
+                		msg_dialog::display(_("Configuration error"), sprintf(_("The sip-context (%s) used by this phone account is not available anymore and will be removed when this account is saved!"), $this->context), WARNING_DIALOG);
+					}
                 }
                 if((isset($vp['v_context']))&&(!empty($vp['v_context']))){
-                    $this->voice_context = $vp['v_context'];
+                    $this->voice_context = $vp['v_context']."as";
+					if(!in_array_strict($this->voice_context, $this->voicemail_contexts)){
+                		msg_dialog::display(_("Configuration error"), sprintf(_("The voice-context (%s) used by this phone account is not available anymore and will be removed when this account is saved!"), $this->voice_context), WARNING_DIALOG);
+					}
                 }
             }
         }
