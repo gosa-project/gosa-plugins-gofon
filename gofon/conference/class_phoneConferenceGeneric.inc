@@ -306,10 +306,10 @@ class conference extends plugin
          ********************/
 
         $cfg_Current  = $this->goFonHomeServers[$this->goFonHomeServer];
-        $r_current    =  @mysql_pconnect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
+        $r_current    =  @mysql_pconnect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
         if(!$r_current){
             new log("debug","gofonconference/".get_class($this),"",array(),@mysql_error($r_current));
-            return(msgPool::dbconnect("GOfon",@mysql_error($r_current), $cfg_Current['SERVER']));
+            return(msgPool::dbconnect("GOfon",@mysql_error($r_current), $cfg_Current['CONNECT_ID']));
         }
         $db_current  =  @mysql_select_db($cfg_Current['DB'],$r_current);
         if(!$db_current){
@@ -324,10 +324,10 @@ class conference extends plugin
 
         if($this->goFonHomeServers != $this->init_HomeServer){
             $cfg_Init  = $this->goFonHomeServers[$this->init_HomeServer] ;
-            $r_init    =  @mysql_pconnect($cfg_Init['SERVER'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD']);
+            $r_init    =  @mysql_pconnect($cfg_Init['CONNECT_ID'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD']);
             if(!$r_init){
                 new log("debug","gofonconference/".get_class($this),"",array(),@mysql_error($r_init));
-                return(msgPool::dbconnect("GOfon",@mysql_error($r_current), $cfg_Init['SERVER']));
+                return(msgPool::dbconnect("GOfon",@mysql_error($r_current), $cfg_Init['CONNECT_ID']));
             }
             $db_init  =  @mysql_select_db($cfg_Init['DB'],$r_init);
             if(!$db_init){
@@ -428,7 +428,7 @@ class conference extends plugin
         /* Connect to current database to be able to add new entries */
         $SQL=array();
         $cfg_Current  = $this->goFonHomeServers[$this->goFonHomeServer] ;
-        $res_cur      =  @mysql_pconnect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
+        $res_cur      =  @mysql_pconnect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
         $db_cur       =  @mysql_select_db($cfg_Current['DB'],$res_cur);
 
         /********************
@@ -455,7 +455,7 @@ class conference extends plugin
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
             if(!$res){
                 new log("debug","gofonconference/".get_class($this),"",array(),@mysql_error($res_cur));
-                return(msgPool::dbquery("GOfon", @mysql_error($res_cur),$cfg_Current['SERVER']));
+                return(msgPool::dbquery("GOfon", @mysql_error($res_cur),$cfg_Current['CONNECT_ID']));
             }
             if($save && mysql_affected_rows($res_cur)) {
                 $SQL[] = "DELETE FROM ".$cfg_Current['EXT_TABLE']." 
@@ -636,7 +636,7 @@ class conference extends plugin
 
         /* Connect to old database */
         $cfg_Init  = $this->goFonHomeServers[$this->init_HomeServer] ;
-        $r_init    =  @mysql_pconnect($cfg_Init['SERVER'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD']);
+        $r_init    =  @mysql_pconnect($cfg_Init['CONNECT_ID'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD']);
         $db_init   =  @mysql_select_db($cfg_Init['DB'],$r_init);
 
         /* Check if there is an old entry */
@@ -645,7 +645,7 @@ class conference extends plugin
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         if(!$res){
             new log("debug","gofonconference/".get_class($this),"",array(),@mysql_error($r_init));
-            return(msgPool::dbquery("GOfon", @mysql_error($res_cur),$cfg_Init['SERVER']));
+            return(msgPool::dbquery("GOfon", @mysql_error($res_cur),$cfg_Init['CONNECT_ID']));
         }
 
         /* There are entries using this cn and/or phone number */
@@ -659,7 +659,7 @@ class conference extends plugin
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$SQL, "Database query");
             if(!$res){
                 new log("debug","gofonconference/".get_class($this),"",array(),@mysql_error($r_init));
-                return(msgPool::dbquery("GOfon", @mysql_error($res_cur),$cfg_Init['SERVER']));
+                return(msgPool::dbquery("GOfon", @mysql_error($res_cur),$cfg_Init['CONNECT_ID']));
             }
 
         }//ENDE  old num availiable ...

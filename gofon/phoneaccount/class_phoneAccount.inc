@@ -148,7 +148,7 @@ class phoneAccount extends plugin
                 }    
                 $cur_cfg = $this->goFonHomeServers[$this->goFonHomeServer];
 
-                $r_con =  @mysql_pconnect($cur_cfg['SERVER'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD']);
+                $r_con =  @mysql_pconnect($cur_cfg['CONNECT_ID'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD']);
                 if(!$r_con){
                     new log("debug","gofonreport/".get_class($this),"",array(),@mysql_error());
                 }
@@ -349,7 +349,7 @@ class phoneAccount extends plugin
                 (isset($cur_cfg['LOGIN']))&&
                 (isset($cur_cfg['PASSWORD']))){
 
-            $r_con =  @mysql_pconnect($cur_cfg['SERVER'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD']);
+            $r_con =  @mysql_pconnect($cur_cfg['CONNECT_ID'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD']);
             if($r_con){
 
                 // Try to select the gophone database
@@ -383,7 +383,7 @@ class phoneAccount extends plugin
 					}
                 }
                 if((isset($vp['v_context']))&&(!empty($vp['v_context']))){
-                    $this->voice_context = $vp['v_context']."as";
+                    $this->voice_context = $vp['v_context'];
 					if(!in_array_strict($this->voice_context, $this->voicemail_contexts)){
                 		msg_dialog::display(_("Configuration error"), sprintf(_("The voice-context (%s) used by this phone account is not available anymore and will be removed when this account is saved!"), $this->voice_context), WARNING_DIALOG);
 					}
@@ -411,7 +411,7 @@ class phoneAccount extends plugin
                 (isset($config['LOGIN']))&&
                 (isset($config['PASSWORD']))){
 
-            $r_con =  @mysql_pconnect($config['SERVER'],$config['LOGIN'],$config['PASSWORD']);
+            $r_con =  @mysql_pconnect($config['CONNECT_ID'],$config['LOGIN'],$config['PASSWORD']);
             if($r_con){
                 $r_db  =  @mysql_select_db($config['DB'],$r_con);
 
@@ -601,7 +601,7 @@ class phoneAccount extends plugin
          * Get configuration to old asterisk home server 
          */ 
         $a_New = $this->goFonHomeServers[$this->goFonHomeServer];  // DB Configuration
-        $new_connection =  @mysql_pconnect($a_New['SERVER'],$a_New['LOGIN'],$a_New['PASSWORD']);
+        $new_connection =  @mysql_pconnect($a_New['CONNECT_ID'],$a_New['LOGIN'],$a_New['PASSWORD']);
         if(!$new_connection){
             $this->generate_error =  msgPool::dbconnect($a_New['SERVER'],@mysql_error($new_connection),
                     _("Abort saving entries to keep the database consistent."));
@@ -626,7 +626,7 @@ class phoneAccount extends plugin
 
             /* Create connection to the database that contains the old entry. 
              */
-            $old_connection =  @mysql_pconnect($a_Remove['SERVER'],$a_Remove['LOGIN'],$a_Remove['PASSWORD']);
+            $old_connection =  @mysql_pconnect($a_Remove['CONNECT_ID'],$a_Remove['LOGIN'],$a_Remove['PASSWORD']);
             if(!$old_connection){
                 $this->generate_error =  msgPool::dbconnect($a_Remove['SERVER'],@mysql_error($old_connection),
                         _("Abort saving entries to keep the database consistent."));
@@ -1656,7 +1656,7 @@ class phoneAccount extends plugin
         }
 
         // Connect to DB server
-        $r_con =  @mysql_pconnect($a_SETUP['SERVER'],$a_SETUP['LOGIN'],$a_SETUP['PASSWORD']);
+        $r_con =  @mysql_pconnect($a_SETUP['CONNECT_ID'],$a_SETUP['LOGIN'],$a_SETUP['PASSWORD']);
 
         // Check if we are  connected correctly
         if(!$r_con){

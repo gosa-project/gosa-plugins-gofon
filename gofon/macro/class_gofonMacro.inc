@@ -167,7 +167,7 @@ class macro extends plugin
          * Check all home server
          ********************/
         foreach($this->goFonHomeServers as $goFonHomeServer => $cfg_Current){
-            $r_current    =  @mysql_pconnect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
+            $r_current    =  @mysql_pconnect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
             if(!$r_current){
                 new log("debug","gofonmacro/".get_class($this),"",array(),@mysql_error($r_current));
                 return ( msgPool::dbconnect("GOfon",@mysql_error(),$cfg_Current['SERVER']));
@@ -201,7 +201,7 @@ class macro extends plugin
         if($save){
             foreach($this->goFonHomeServers as $dn => $Server){
                 $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysql_real_escape_string($context)."';";
-                $r_current  =  @mysql_pconnect($Server['SERVER'],$Server['LOGIN'],$Server['PASSWORD']);
+                $r_current  =  @mysql_pconnect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD']);
                 $db_current =  @mysql_select_db($Server['DB'],$r_current);
                 $res = @mysql_query($query,$r_current);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
@@ -244,7 +244,7 @@ class macro extends plugin
 
         /* Macro are spread to each asterisk server */
         foreach($this->goFonHomeServers as $dn => $cfg){
-            $r_con  = @mysql_pconnect($cfg['SERVER'],$cfg['LOGIN'],$cfg['PASSWORD']); 
+            $r_con  = @mysql_pconnect($cfg['CONNECT_ID'],$cfg['LOGIN'],$cfg['PASSWORD']); 
             $db     = @mysql_select_db($cfg['DB'],$r_con);
 
             /************

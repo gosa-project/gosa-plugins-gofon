@@ -196,7 +196,7 @@ class fonreport extends plugin
                 }
             }
 
-            $link = @mysql_pconnect($cfg['SERVER'], $cfg['LOGIN'], $cfg['PASSWORD']);
+            $link = @mysql_pconnect($cfg['CONNECT_ID'], $cfg['LOGIN'], $cfg['PASSWORD']);
             if ($link === FALSE){
                 msg_dialog::display(_("Error"), msgPool::dbconnect(
                             _("GOfon"),@mysql_error(),$cfg['SERVER']),ERROR_DIALOG);
@@ -215,7 +215,7 @@ class fonreport extends plugin
          *****************/
 
         // Get entries for the selected range only.
-        $link   = @mysql_pconnect($cfg['SERVER'], $cfg['LOGIN'], $cfg['PASSWORD']);
+        $link   = @mysql_pconnect($cfg['CONNECT_ID'], $cfg['LOGIN'], $cfg['PASSWORD']);
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         $query  = $this->CreateQuerySyntax();
         $result = @mysql_query($query);
