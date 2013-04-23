@@ -1880,6 +1880,17 @@ class phoneAccount extends plugin
                           "group"         => "asterisk",
                           "mandatory"     => TRUE
                       ),
+                      array(
+                          "name"          => "connectAttribute",
+                          "type"          => "switch",
+                          "default"       => "cn",
+                          "description"   => _("The attribute to use for database conmnections."),
+						  "check"         => "",
+						  "defaults"      => "phoneAccount::getPropertyValues",
+                          "migrate"       => "",
+                          "group"         => "asterisk",
+                          "mandatory"     => TRUE
+                      )
                     ),
                     "plProvidedAcls"  => array(
                         "telephoneNumber"     => _("Telephone number"),
@@ -2041,6 +2052,11 @@ class phoneAccount extends plugin
         array_unique($contexts);
         return($contexts);
     }
-}
 
+
+    static function getPropertyValues($class,$name,$value,$type)
+    {
+    	return(array('cn' => _('Hostname'), 'ipHostNumber' => _('Ip address')));
+	}
+}
 ?>
