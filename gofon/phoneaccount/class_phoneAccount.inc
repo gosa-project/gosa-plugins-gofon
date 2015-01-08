@@ -733,7 +733,22 @@ class phoneAccount extends plugin
             /* Set the first given phone number as callerid */
             reset($newnums);        
             $i_new_key = key($newnums);
-            $sip_data_array['callerid']  =$newnums[$i_new_key];
+            
+            if(isset($this->parent->by_object['user']->givenName) && isset($this->parent->by_object['user']->sn)){
+              $tCallerId = $this->parent->by_object['user']->givenName .' '. $this->parent->by_object['user']->sn .' <'. $newnums[$i_new_key] . ">";
+              
+              if(strlen($tCallerid) > 80){
+                $tCallerId = substr($this->parent->by_object['user']->givenName, 0, 1) .' '. $this->parent->by_object['user']->sn .' <'. $newnums[$i_new_key] . ">";
+
+                if(strlen($tCallerid) > 80){
+                  $tCallerId = substr($tCallerId, -80);
+                }
+              }
+
+              $sip_data_array['callerid']  = $tCallerId;
+            } else {
+              $sip_data_array['callerid']  = $newnums[$i_new_key];
+            }
             $sip_data_array['mailbox']   =$newnums[$i_new_key]."@".$this->voice_context;
 
             /* Check if there is already an entry in sip_users for this uid */
