@@ -52,7 +52,7 @@ class phoneGeneric extends plugin
 
     var $objectclasses= array("top", "goFonHardware");
 
-    function phoneGeneric (&$config, $dn= NULL, $parent= NULL)
+    function __construct(&$config, $dn= NULL, $parent= NULL)
     {
         plugin::plugin ($config, $dn, $parent);
         $this->netConfigDNS = new termDNS($this->config,$this,$this->objectclasses, true);

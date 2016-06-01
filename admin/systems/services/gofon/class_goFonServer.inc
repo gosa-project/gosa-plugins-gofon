@@ -28,7 +28,7 @@ class goFonServer extends goService{
 
     var $orig_dn            = "";   
 
-    function goFonServer(&$config,$dn)
+    function __construct(&$config,$dn)
     {
         goService::goService($config,$dn);
         $this->DisplayName = _("VoIP service");

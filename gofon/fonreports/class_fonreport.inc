@@ -29,7 +29,7 @@ class fonreport extends plugin
     var $telephoneNumberToDN = array();
 
     /* Construct class */
-    function fonreport (&$config, $ui)
+    function __construct(&$config, $ui)
     {
         /* Include config object */
         $this->initTime = microtime(TRUE);

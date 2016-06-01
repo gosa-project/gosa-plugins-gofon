@@ -3,7 +3,7 @@
 class phonetabs extends tabs
 {
 
-  function phonetabs($config, $data, $dn,$category)
+  function __construct($config, $data, $dn,$category)
   {
     tabs::tabs($config, $data, $dn,$category);
 

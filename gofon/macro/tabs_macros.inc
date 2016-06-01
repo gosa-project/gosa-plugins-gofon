@@ -3,7 +3,7 @@
 class macrotabs extends tabs
 {
 
-    function macrotabs($config, $data, $dn,$category)
+    function __construct($config, $data, $dn,$category)
     {
         tabs::tabs($config, $data, $dn,$category);
 

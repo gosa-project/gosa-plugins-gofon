@@ -55,7 +55,7 @@ class phoneAccount extends plugin
     var $has_mailAccount  = FALSE;
     var $pager      = "";
 
-    function phoneAccount (&$config, $dn= NULL, $parent= NULL)
+    function __construct(&$config, $dn= NULL, $parent= NULL)
     {
         plugin::plugin ($config, $dn, $parent);
 

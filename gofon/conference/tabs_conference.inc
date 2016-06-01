@@ -4,7 +4,7 @@ class conferencetabs extends tabs
 {
     var $base= "";
 
-    function conferencetabs($config, $data, $dn, $category)
+    function __construct($config, $data, $dn, $category)
     {
         tabs::tabs($config, $data, $dn,$category);
         $this->base= $this->by_object['conference']->base; 

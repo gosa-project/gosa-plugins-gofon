@@ -68,7 +68,7 @@ class conference extends plugin
     var $orig_dn ="";
     var $orig_base = "";
 
-    function conference (&$config, $dn, $plugin= NULL)
+    function __construct(&$config, $dn, $plugin= NULL)
     {
         plugin::plugin($config, $dn, $plugin);
         $this->is_account	= TRUE;
