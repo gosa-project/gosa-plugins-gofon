@@ -65,7 +65,7 @@ class phonequeue extends plugin
      */
     function __construct(&$config, $dn= NULL)
     {
-        plugin::plugin($config, $dn);
+        plugin::__construct($config, $dn);
 
         /* Check server configurations
          * Load all server configuration in $this->goFonHomeServers if available

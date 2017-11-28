@@ -38,7 +38,7 @@ class macroParameter extends plugin
      */
     function __construct(&$config, $dn= NULL, $parent= NULL)
     {
-        plugin::plugin ($config, $dn, $parent);
+        plugin::__construct ($config, $dn, $parent);
 
         $tmp = array();  // temporary Var 
         $tmp2 = array(); // temporary Var ...

@@ -70,7 +70,7 @@ class conference extends plugin
 
     function __construct(&$config, $dn, $plugin= NULL)
     {
-        plugin::plugin($config, $dn, $plugin);
+        plugin::__construct($config, $dn, $plugin);
         $this->is_account	= TRUE;
         $this->ui			    = get_userinfo();
         $this->orig_dn		= $dn;

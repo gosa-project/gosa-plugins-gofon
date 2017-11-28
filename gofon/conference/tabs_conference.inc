@@ -6,7 +6,7 @@ class conferencetabs extends tabs
 
     function __construct($config, $data, $dn, $category)
     {
-        tabs::tabs($config, $data, $dn,$category);
+        tabs::__construct($config, $data, $dn,$category);
         $this->base= $this->by_object['conference']->base; 
 
         /* Add references/acls/snapshots */

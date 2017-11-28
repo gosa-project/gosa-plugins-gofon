@@ -57,7 +57,7 @@ class phoneAccount extends plugin
 
     function __construct(&$config, $dn= NULL, $parent= NULL)
     {
-        plugin::plugin ($config, $dn, $parent);
+        plugin::__construct ($config, $dn, $parent);
 
         $this->delimiter = $this->config->get_cfg_value("phoneAccount","delimiter");
 
@@ -1940,7 +1940,7 @@ class phoneAccount extends plugin
 
     function init_multiple_support($attrs,$all)
     {
-        plugin::init_multiple_support($attrs,$all);
+        plugin::__constructit_multiple_support($attrs,$all);
 
         $this->phoneNumbers = array();
         if(isset($all['phoneNumbers'])){

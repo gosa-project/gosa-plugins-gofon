@@ -5,7 +5,7 @@ class phonetabs extends tabs
 
   function __construct($config, $data, $dn,$category)
   {
-    tabs::tabs($config, $data, $dn,$category);
+    tabs::__construct($config, $data, $dn,$category);
 
     /* Add references/acls/snapshots */
     $this->addSpecialTabs();

@@ -30,7 +30,7 @@ class goFonServer extends goService{
 
     function __construct(&$config,$dn)
     {
-        goService::goService($config,$dn);
+        goService::__construct($config,$dn);
         $this->DisplayName = _("VoIP service");
 
         $this->orig_dn = $dn;

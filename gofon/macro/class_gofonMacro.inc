@@ -49,7 +49,7 @@ class macro extends plugin
     /*!  Konstructor, load class with  attributes of the given dn*/
     function __construct(&$config, $dn= NULL, $parent= NULL)
     {
-        plugin::plugin ($config, $dn, $parent);
+        plugin::__construct ($config, $dn, $parent);
 
         /* This is always an account */
         $this->is_account= TRUE;
