@@ -180,7 +180,7 @@ class fonreport extends plugin
             msg_dialog::display(_("Configuration error"), msgPool::noserver(
                         _("GOfon")), WARNING_DIALOG);
             return($smarty->fetch(get_template_path('contents.tpl', TRUE)));
-        }elseif(!is_callable("mysql_connect")){
+        }elseif(!is_callable("mysqli_connect")){
             msg_dialog::display(_("Configuration error"), msgPool::missingext("php-mysql"), WARNING_DIALOG);
             return($smarty->fetch(get_template_path('contents.tpl', TRUE)));
         }else{
@@ -196,15 +196,10 @@ class fonreport extends plugin
                 }
             }
 
-            $link = @mysql_pconnect($cfg['CONNECT_ID'], $cfg['LOGIN'], $cfg['PASSWORD']);
-            if ($link === FALSE){
+            $link = @mysqli_connect($cfg['CONNECT_ID'], $cfg['LOGIN'], $cfg['PASSWORD'], $cfg['DB']);
+            if (mysqli_connect_errno($link)){
                 msg_dialog::display(_("Error"), msgPool::dbconnect(
-                            _("GOfon"),@mysql_error(),$cfg['SERVER']),ERROR_DIALOG);
-                return($smarty->fetch(get_template_path('contents.tpl', TRUE)));
-            }
-            if (! @mysql_select_db("gophone")){
-                msg_dialog::display(_("Error"), msgPool::dbselect(
-                            _("GOfon"),@mysql_error(),$cfg['DB']),ERROR_DIALOG);
+                            _("GOfon"),@mysqli_error(),$cfg['SERVER']),ERROR_DIALOG);
                 return($smarty->fetch(get_template_path('contents.tpl', TRUE)));
             }
         }
@@ -215,13 +210,13 @@ class fonreport extends plugin
          *****************/
 
         // Get entries for the selected range only.
-        $link   = @mysql_pconnect($cfg['CONNECT_ID'], $cfg['LOGIN'], $cfg['PASSWORD']);
+        $link   = @mysqli_connect($cfg['CONNECT_ID'], $cfg['LOGIN'], $cfg['PASSWORD'], $cfg['DB']);
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         $query  = $this->CreateQuerySyntax();
-        $result = @mysql_query($query);
+        $result = @mysqli_query($query);
         if ($result === false){
             msg_dialog::display(_("Error"), msgPool::dbquery(
-                        _("GOfon"),@mysql_error(),$cfg['SERVER']),ERROR_DIALOG);
+                        _("GOfon"),@mysqli_error(),$cfg['SERVER']),ERROR_DIALOG);
             return($smarty->fetch(get_template_path('contents.tpl', TRUE)));
         }
 
@@ -238,7 +233,7 @@ class fonreport extends plugin
 
         $no_acl = "&nbsp;-";
 
-        while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+        while ($line = mysqli_fetch_array($result, MYSQL_ASSOC)) {
 
             // Get dn to check ACLs for
             // Existing ldap-user -> use its dn
@@ -291,7 +286,7 @@ class fonreport extends plugin
             $report_list[] = $append_str;
         }
 
-        @mysql_close($link);
+        @mysqli_close($link);
 
 
         /*****************
@@ -410,9 +405,9 @@ class fonreport extends plugin
 
         $query = "SELECT {$fieldset} FROM cdr ".
             "WHERE   
-            calldate <= ".mysql_real_escape_string($end)." 
+            calldate <= ".mysqli_real_escape_string($end)." 
             AND 
-            calldate >= ".mysql_real_escape_string($start)." 
+            calldate >= ".mysqli_real_escape_string($start)." 
             ". $uidstring." 
             ORDER BY ".$this->fields[$this->sort]." $desc";
 

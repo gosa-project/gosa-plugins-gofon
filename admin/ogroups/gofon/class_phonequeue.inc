@@ -73,7 +73,7 @@ class phonequeue extends plugin
          */
         if(isset($config->data['SERVERS']['FON']) && 
                 count($config->data['SERVERS']['FON']) &&
-                is_callable("mysql_connect")){
+                is_callable("mysqli_connect")){
 
             /* Set available server */
             $this->goFonHomeServers = $config->data['SERVERS']['FON'];
@@ -142,9 +142,9 @@ class phonequeue extends plugin
      */
     function check_database_accessibility()
     {
-        /* Check if mysql extension is available */
-        if(!is_callable("mysql_pconnect")){
-            return(msgPool::missingext("mysql"));
+        /* Check if mysqli extension is available */
+        if(!is_callable("mysqli_connect")){
+            return(msgPool::missingext("mysqli"));
         }
 
         /********************
@@ -152,16 +152,10 @@ class phonequeue extends plugin
          ********************/
 
         $cfg_Current  = $this->goFonHomeServers[$this->goFonHomeServer];
-        $r_current    =  @mysql_pconnect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
+        $r_current    =  @mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
         if(!$r_current){
-            new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($r_current));
-            return(msgPool::dbconnect("GOfon",@mysql_error($r_current),$cfg_Current['SERVER']));
-        }
-        $db_current  =  @mysql_select_db($cfg_Current['DB'],$r_current);
-        if(!$db_current){
-            new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($r_current));
-            mysql_close($r_current);
-            return(msgPool::dbselect("GOfon",@mysql_error($r_current),$cfg_Current['DB']));
+          new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($r_current));
+          return(msgPool::dbconnect("GOfon",@mysqli_error($r_current),$cfg_Current['SERVER'].":".$cfg_Current['DB']));
         }
 
         /********************
@@ -170,16 +164,10 @@ class phonequeue extends plugin
 
         if($this->initially_was_account){
             $cfg_Init  = $this->goFonHomeServers[$this->init_HomeServer] ;
-            $r_init    =  @mysql_pconnect($cfg_Init['SERVER'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD']);
+            $r_init    =  @mysqli_connect($cfg_Init['SERVER'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD'], $cfg_Init['DB']);
             if(!$r_init){
-                new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($r_init));
-                return(msgPool::dbconnect("GOfon",@mysql_error($r_current),$cfg_Init['SERVER']));
-            }
-            $db_init  =  @mysql_select_db($cfg_Init['DB'],$r_init);
-            if(!$db_init){
-                new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($r_init));
-                mysql_close($r_init);
-                return(msgPool::dbselect("GOfon",@mysql_error($r_current),$cfg_Init['DB']));
+              new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($r_init));
+              return(msgPool::dbconnect("GOfon",@mysqli_error($r_current),$cfg_Init['SERVER'].":".$cfg_Init['DB']));
             }
         }
     }
@@ -358,8 +346,7 @@ class phonequeue extends plugin
 
             /* Connect to current database to be able to add new entries */
             $cfg_Current  = $this->goFonHomeServers[$this->init_HomeServer] ;
-            $res_cur      =  @mysql_pconnect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
-            $db_cur       =  @mysql_select_db($cfg_Current['DB'],$res_cur);
+            $res_cur      =  @mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
 
             /* Create sql entries */
             $delete[]=    "DELETE FROM ".$cfg_Current['EXT_TABLE']."    WHERE exten='".$this->old_cn."';\n";
@@ -372,10 +359,10 @@ class phonequeue extends plugin
             /* Execute the queries */  
             if($save){
                 foreach($delete as $sql){
-                    $res = @mysql_query($sql,$res_cur);
+                    $res = @mysqli_query($sql,$res_cur);
                     if(!$res){
-                        new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($r_current));
-                        return(msgPool::dbquery(_("GOfon"),@mysql_error($r_current)));
+                        new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($r_current));
+                        return(msgPool::dbquery(_("GOfon"),@mysqli_error($r_current)));
                     }
                 }
             }
@@ -406,8 +393,7 @@ class phonequeue extends plugin
 
         /* Connect to current database to be able to add new entries */
         $cfg_Current  = $this->goFonHomeServers[$this->goFonHomeServer] ;
-        $res_cur      =  @mysql_pconnect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
-        $db_cur       =  @mysql_select_db($cfg_Current['DB'],$res_cur);
+        $res_cur      =  @mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
 
         /* Connect to old home server and remove old entries if necessary */
         if(($this->initially_was_account) && ($this->init_HomeServer != $this->goFonHomeServer)){
@@ -431,12 +417,12 @@ class phonequeue extends plugin
              *  else update the entry with new values.
              */
             $query = "SELECT * FROM ".$cfg_Current['QUEUE_TABLE']."  WHERE name='".$this->old_cn."';";
-            $res   = mysql_query($query,$res_cur);
+            $res   = mysqli_query($query,$res_cur);
             if(!$res){
-                new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($res_cur));
+                new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($res_cur));
                 return(_("Cannot find old queue entry!"));
             }
-            $cnt = mysql_affected_rows($res_cur);
+            $cnt = mysqli_affected_rows($res_cur);
 
 
             /* Create queue table entry 
@@ -502,7 +488,7 @@ class phonequeue extends plugin
 
                 /* Update queue table entry 
                  */
-                $queue_old = @mysql_fetch_assoc($res);
+                $queue_old = @mysqli_fetch_assoc($res);
                 foreach($queue_old as $name => $value){
                     if(isset($queue[$name]) && $queue[$name] == $value){
                         unset($queue[$name]);
@@ -726,13 +712,13 @@ class phonequeue extends plugin
             /* Do all collected mysql queries 
              */
             foreach($SQL as $query)
-                $res   = mysql_query($query,$res_cur);
+                $res   = mysqli_query($query,$res_cur);
             if(!$res){
-                new log("debug","ogroups/".get_class($this),"",array(),@mysql_error($res_cur));
-                return(msgPool::dbquery(_("GOfon"),@mysql_error($res_cur)));
+                new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($res_cur));
+                return(msgPool::dbquery(_("GOfon"),@mysqli_error($res_cur)));
             }
         }
-        @mysql_close($r_con);
+        @mysqli_close($r_con);
         return(false);
     }
 

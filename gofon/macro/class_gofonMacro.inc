@@ -159,7 +159,7 @@ class macro extends plugin
     function check_database_accessibility()
     {
         /* Check if mysql extension is available */
-        if(!is_callable("mysql_pconnect")){
+        if(!is_callable("mysqli_connect")){
             return(msgPool::missingext("php-mysql"));
         }
 
@@ -167,16 +167,10 @@ class macro extends plugin
          * Check all home server
          ********************/
         foreach($this->goFonHomeServers as $goFonHomeServer => $cfg_Current){
-            $r_current    =  @mysql_pconnect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD']);
-            if(!$r_current){
-                new log("debug","gofonmacro/".get_class($this),"",array(),@mysql_error($r_current));
-                return ( msgPool::dbconnect("GOfon",@mysql_error(),$cfg_Current['SERVER']));
-            }
-            $db_current  =  @mysql_select_db($cfg_Current['DB'],$r_current);
-            if(!$db_current){
-                new log("debug","gofonmacro/".get_class($this),"",array(),@mysql_error($r_current));
-                mysql_close($r_current);
-                return ( msgPool::dbselect("GOfon",@mysql_error(),$cfg_Current['DB']));
+            $r_current    =  @mysqli_connect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
+            if(mysqli_connect_error($r_current)){
+              new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_current));
+              return ( msgPool::dbconnect("GOfon",@mysqli_error(),$cfg_Current['SERVER'].":".$cfg_Current['DB']));
             }
         }
     }
@@ -200,21 +194,20 @@ class macro extends plugin
         /* Remove current macro from each server available */ 
         if($save){
             foreach($this->goFonHomeServers as $dn => $Server){
-                $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysql_real_escape_string($context)."';";
-                $r_current  =  @mysql_pconnect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD']);
-                $db_current =  @mysql_select_db($Server['DB'],$r_current);
-                $res = @mysql_query($query,$r_current);
+                $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysqli_real_escape_string($context)."';";
+                $r_current  =  @mysqli_connect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
+                $res = @mysqli_query($query,$r_current);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
                 if(!$res){
-                    new log("debug","gofonmacro/".get_class($this),"",array(),@mysql_error($r_current));
+                    new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_current));
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "ERROR");
-                    trigger_error(mysql_error($r_current));
+                    trigger_error(mysqli_error($r_current));
                     return(
                             sprintf(
                                 _("Macro could not be removed from server '%s', please check database consistency!"), 
                                 $Server['SERVER']));
                 }
-                @mysql_close($r_current);
+                @mysqli_close($r_current);
             }
         }
     }
@@ -244,8 +237,7 @@ class macro extends plugin
 
         /* Macro are spread to each asterisk server */
         foreach($this->goFonHomeServers as $dn => $cfg){
-            $r_con  = @mysql_pconnect($cfg['CONNECT_ID'],$cfg['LOGIN'],$cfg['PASSWORD']); 
-            $db     = @mysql_select_db($cfg['DB'],$r_con);
+            $r_con  = @mysqli_connect($cfg['CONNECT_ID'],$cfg['LOGIN'],$cfg['PASSWORD'], $cfg['DB']); 
 
             /************
              * Parse Macro content
@@ -308,11 +300,11 @@ class macro extends plugin
                  *  and add this line to an array that will be inserted 
                  *  to each database.
                  */
-                $context= mysql_real_escape_string($context);
-                $exten  = mysql_real_escape_string($tmp[0]);
-                $prio   = mysql_real_escape_string($tmp[1]);
-                $app    = mysql_real_escape_string(preg_replace("/\(.*\).*$/","",$tmp[2]));
-                $para   = mysql_real_escape_string(preg_replace("/^[^(]*\((.*)\)[^)]*$/", "$1", $tmp[2]));
+                $context= mysqli_real_escape_string($context);
+                $exten  = mysqli_real_escape_string($tmp[0]);
+                $prio   = mysqli_real_escape_string($tmp[1]);
+                $app    = mysqli_real_escape_string(preg_replace("/\(.*\).*$/","",$tmp[2]));
+                $para   = mysqli_real_escape_string(preg_replace("/^[^(]*\((.*)\)[^)]*$/", "$1", $tmp[2]));
                 $sql.= " ('".$context."','".$exten."','".$prio."','".$app."','".$para."'),";
             }
 
@@ -322,19 +314,19 @@ class macro extends plugin
             /* Save current changes to the database */
             $query  = preg_replace("/%TABLENAME%/",$cfg['EXT_TABLE'],$sql);
             if($save){
-                $res    = @mysql_query($query,$r_con);
+                $res    = @mysqli_query($query,$r_con);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
                 if(!$res){
-                    new log("debug","gofonmacro/".get_class($this),"",array(),@mysql_error($r_con));
+                    new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_con));
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "ERROR");
-                    trigger_error(mysql_error($r_con));
+                    trigger_error(mysqli_error($r_con));
                     return(
                             sprintf(
                                 _("Macro could not be added to server '%s', please check database consistency!"), 
                                 $cfg['SERVER']));
                 }
             }
-            @mysql_close($r_con);
+            @mysqli_close($r_con);
         }
     }
 
