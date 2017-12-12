@@ -359,7 +359,7 @@ class phonequeue extends plugin
             /* Execute the queries */  
             if($save){
                 foreach($delete as $sql){
-                    $res = @mysqli_query($sql,$res_cur);
+                    $res = @mysqli_query($res_cur, $sql);
                     if(!$res){
                         new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($r_current));
                         return(msgPool::dbquery(_("GOfon"),@mysqli_error($r_current)));
@@ -417,7 +417,7 @@ class phonequeue extends plugin
              *  else update the entry with new values.
              */
             $query = "SELECT * FROM ".$cfg_Current['QUEUE_TABLE']."  WHERE name='".$this->old_cn."';";
-            $res   = mysqli_query($query,$res_cur);
+            $res   = mysqli_query($res_cur, $query);
             if(!$res){
                 new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($res_cur));
                 return(_("Cannot find old queue entry!"));
@@ -712,7 +712,7 @@ class phonequeue extends plugin
             /* Do all collected mysql queries 
              */
             foreach($SQL as $query)
-                $res   = mysqli_query($query,$res_cur);
+                $res   = mysqli_query($res_cur, $query);
             if(!$res){
                 new log("debug","ogroups/".get_class($this),"",array(),@mysqli_error($res_cur));
                 return(msgPool::dbquery(_("GOfon"),@mysqli_error($res_cur)));

@@ -196,7 +196,7 @@ class macro extends plugin
             foreach($this->goFonHomeServers as $dn => $Server){
                 $r_current  =  mysqli_connect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
                 $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysqli_real_escape_string($r_current, $context)."';";
-                $res = mysqli_query($query,$r_current);
+                $res = mysqli_query($r_current, $query);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
                 if(!$res){
                     new log("debug","gofonmacro/".get_class($this),"",array(),mysqli_error($r_current));
@@ -314,7 +314,7 @@ class macro extends plugin
             /* Save current changes to the database */
             $query  = preg_replace("/%TABLENAME%/",$cfg['EXT_TABLE'],$sql);
             if($save){
-                $res    = @mysqli_query($query,$r_con);
+                $res    = @mysqli_query($r_con, $query);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
                 if(!$res){
                     new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_con));

@@ -440,7 +440,7 @@ class conference extends plugin
          */
         if($this->goFonHomeServer != $this->init_HomeServer){
             $query = "SELECT id FROM ".$cfg_Current['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($res_cur, $this->telephoneNumber)."' OR exten='".$this->cn."';";
-            $res = mysqli_query($query,$res_cur);
+            $res = mysqli_query($res_cur, $query);
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
             if(!$res){
                 new log("debug","gofonconference/".get_class($this),"",array(),@mysqli_error($res_cur));
@@ -574,12 +574,12 @@ class conference extends plugin
              */
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Updating/Inserting entries---</b>","");
 
-            mysqli_query("begin;",$res_cur);
+            mysqli_query($res_cur, "begin;");
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>begin;</b>","<i>Starting transaction!</i>");
 
             foreach($SQL as $query){
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "");
-                if(!mysqli_query($query,$res_cur)){
+                if(!mysqli_query($res_cur, $query)){
                     $err = mysqli_error($res_cur);
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"\n".$err, "<b>FAILED</b>");
                     msg_dialog::display(_("Error"),
@@ -587,7 +587,7 @@ class conference extends plugin
                             "\n<p>"._("Please activate debugging for details!")."</p>",
                             ERROR_DIALOG);
 
-                    mysqli_query("rollback;",$res_cur);
+                    mysqli_query($res_cur, "rollback;");
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>rollback;</b>", "<b>ERROR</b> Rollback transaction!");
                     @mysqli_close($res_cur);
                     return(false);
@@ -596,7 +596,7 @@ class conference extends plugin
 
             /* Let changes get active, everything was fine;
              */
-            mysqli_query("commit;",$res_cur);
+            mysqli_query($res_cur, "commit;");
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>commit;</b>", "");
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Transaction sucessful!---</b>", "");
         } 
@@ -629,7 +629,7 @@ class conference extends plugin
 
         /* Check if there is an old entry */
         $query = "SELECT id FROM ".$cfg_Init['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($r_init, $this->old_tele_number)."' OR exten='".mysqli_real_escape_string($r_init, $this->old_cn)."';";
-        $res = @mysqli_query($query,$r_init);
+        $res = mysqli_query($r_init, $query);
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         if(!$res){
             new log("debug","gofonconference/".get_class($this),"",array(),@mysqli_error($r_init));
@@ -643,7 +643,7 @@ class conference extends plugin
                 OR    (exten='".mysqli_real_escape_string($r_init, $this->old_cn)."')";
 
             /* Query and ensure that everything went fine */
-            $res =  @mysqli_query($SQL,$r_init);
+            $res =  mysqli_query($r_init,$SQL);
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$SQL, "Database query");
             if(!$res){
                 new log("debug","gofonconference/".get_class($this),"",array(),@mysqli_error($r_init));

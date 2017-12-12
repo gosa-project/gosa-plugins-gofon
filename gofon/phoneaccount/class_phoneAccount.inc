@@ -355,7 +355,7 @@ class phoneAccount extends plugin
                     ".$cur_cfg['SIP_TABLE']." 
                         WHERE ".$cur_cfg['VOICE_TABLE'].".mailbox = ".mysqli_real_escape_string($r_con, $num)." 
                         AND ".$cur_cfg['SIP_TABLE'].".name='".mysqli_real_escape_string($r_con, $this->uid)."'";
-                $res = mysqli_query($query_tmp);
+                $res = mysqli_query($r_con, $query_tmp);
                 $vp  = mysqli_fetch_assoc($res);
                 if(!isset($vp['context'])){
                     $this->is_modified= TRUE;
@@ -409,14 +409,14 @@ class phoneAccount extends plugin
                 $inno_tables = array("SIP_TABLE","EXT_TABLE","VOICE_TABLE","QUEUE_TABLE","QUEUE_MEMBER_TABLE"); 
                 foreach($inno_tables as $inno_table){
                     $sql = "show table status like '".mysqli_real_escape_string($r_con, $config[$inno_table])."';";
-                    $res = mysqli_query($sql);
+                    $res = mysqli_query($r_con, $sql);
                     $vp  = mysqli_fetch_assoc($res);
                     if(!preg_match("/^InnoDB$/i",$vp['Engine'])){
 
                         /* Not an InnoDB Table type, try to modify type. 
                          */
                         $sql = "ALTER TABLE `".$config[$inno_table]."` ENGINE = INNODB; ";
-                        $res = mysqli_query($sql);
+                        $res = mysqli_query($r_con, $sql);
                         if(!$res){
                             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$sql."</b>", 
                                     "<b>FAILED!</b>. Transactions will not work!");
@@ -639,7 +639,7 @@ class phoneAccount extends plugin
                 }
 
                 $query  = "SELECT id,name,callerid FROM ".$a_Remove['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($old_connection, $this->uid)."';";
-                $rid    = mysqli_query($query,$old_connection);
+                $rid    = mysqli_query($old_connection, $query);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, 
                         "<i>Reguest callerid to be able to identify the user.</i>");
 
@@ -663,12 +663,12 @@ class phoneAccount extends plugin
                      */
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Removing entry from old server---</b>","");
 
-                    mysqli_query("begin;",$old_connection);
+                    mysqli_query($old_connection, "begin;");
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>begin;</b>","<i>Starting transaction!</i>");
 
                     foreach($query_a as $query){
                         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "");
-                        if(!mysqli_query($query,$old_connection)){
+                        if(!mysqli_query($old_connection, $query)){
                             $err = mysqli_error($old_connection);
                             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"\n".$err, "<b>FAILED</b>");
                             msg_dialog::display(_("Error"), 
@@ -676,7 +676,7 @@ class phoneAccount extends plugin
                                     "\n<p>"._("Please activate debugging for details!")."</p>",
                                     ERROR_DIALOG);
 
-                            mysqli_query("rollback;",$old_connection);
+                            mysqli_query($old_connection,"rollback;");
                             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>rollback;</b>", "<b>ERROR</b> Rollback transaction!");
                             @mysqli_close($old_connection);
                             return(false);
@@ -685,7 +685,7 @@ class phoneAccount extends plugin
 
                     /* Let changes get active, everything was fine;
                      */ 
-                    mysqli_query("commit;",$old_connection);
+                    mysqli_query($old_connection, "commit;");
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>commit;</b>", "");
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Transaction sucessful!---</b>", "");
                 }
@@ -734,7 +734,7 @@ class phoneAccount extends plugin
             $SQL_query_array[] = "SET @@sql_mode = STRICT_ALL_TABLES;";
 
             $query = "SELECT * FROM ".$a_New['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($new_connection, $this->uid)."';\n"; 
-            $rid = mysqli_query($query,$new_connection);
+            $rid = mysqli_query($new_connection, $query);
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Receive current mysql entries.");
             if(mysqli_affected_rows($new_connection)){
 
@@ -829,7 +829,7 @@ class phoneAccount extends plugin
 
             $customer_id = $newnums[$i_new_key];
             $query  = "SELECT id,name,callerid FROM ".$a_New['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($new_connection, $this->uid)."';";
-            $rid    = mysqli_query($query,$new_connection);
+            $rid    = mysqli_query($new_connection, $query);
 
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Receive callerid");
             $result = mysqli_fetch_assoc($rid);
@@ -851,7 +851,7 @@ class phoneAccount extends plugin
 
             /* Check if there is already an entry in sip_users for this uid */
             $query_tmp = "SELECT * FROM ".$a_New['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($new_connection, $old_customer_id)."';\n";
-            $rid = mysqli_query($query_tmp,$new_connection);
+            $rid = mysqli_query($new_connection, $query_tmp);
 
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query_tmp, "Check if voicemail entry exists");
             if(mysqli_affected_rows($new_connection)){
@@ -1000,12 +1000,12 @@ class phoneAccount extends plugin
              */
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Insert/Update new entry---</b>","");
 
-            mysqli_query("begin;",$new_connection);
+            mysqli_query($new_connection, "begin;");
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>begin;</b>","<i>Starting transaction!</i>");
 
             foreach($SQL_query_array as $query){
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "");
-                if(!mysqli_query($query,$new_connection)){
+                if(!mysqli_query($new_connection, $query)){
                     $err = mysqli_error($new_connection);
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"\n".$err, "<b>FAILED</b>");
                     msg_dialog::display(_("Error"), 
@@ -1013,7 +1013,7 @@ class phoneAccount extends plugin
                             "\n<p>"._("Please activate debugging for details!")."</p>",
                             ERROR_DIALOG);
 
-                    mysqli_query("rollback;",$new_connection);
+                    mysqli_query($new_connection, "rollback;");
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>rollback;</b>", "<b>ERROR</b> Rollback transaction!");
                     @mysqli_close($new_connection);
                     return(false);
@@ -1022,7 +1022,7 @@ class phoneAccount extends plugin
 
             /* Let changes get active, everything was fine;
              */ 
-            mysqli_query("commit;",$new_connection);
+            mysqli_query($new_connection, "commit;");
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>commit;</b>", "Perform transaction!");
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Transaction sucessful!---</b>", "");
         }
@@ -1669,7 +1669,7 @@ class phoneAccount extends plugin
 
 
         $query  = "SELECT id,name,callerid FROM ".$a_SETUP['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($r_con, $this->uid)."';";
-        $rid    = mysqli_query($query,$r_con);
+        $rid    = mysqli_query($r_con, $query);
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         $result = mysqli_fetch_assoc($rid);
         $callerid = $first_num;
@@ -1688,13 +1688,13 @@ class phoneAccount extends plugin
          */
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Removing entry from server---</b>","");
 
-        mysqli_query("begin;",$r_con);
+        mysqli_query($r_con, "begin;");
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>begin;</b>","<i>Starting transaction!</i>");
 
         foreach($SQL as $query){
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "");
 
-            if(!mysqli_query($query,$r_con)){
+            if(!mysqli_query($r_con, $query)){
                 $err = mysqli_error($r_con);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"\n".$err, "<b>FAILED</b>");
                 msg_dialog::display(_("Error"),
@@ -1702,7 +1702,7 @@ class phoneAccount extends plugin
                         "\n<p>"._("Please activate debugging for details!")."</p>",
                         ERROR_DIALOG);
 
-                mysqli_query("rollback;",$r_con);
+                mysqli_query($r_con, "rollback;");
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>rollback;</b>", "<b>ERROR</b> Rollback transaction!");
                 @mysqli_close($r_con);
                 return(false);
@@ -1711,7 +1711,7 @@ class phoneAccount extends plugin
 
         /* Let changes get active, everything was fine;
          */
-        mysqli_query("commit;",$r_con);
+        mysqli_query($r_con, "commit;");
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>commit;</b>", "");
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>---Transaction sucessful!---</b>", "");
 
