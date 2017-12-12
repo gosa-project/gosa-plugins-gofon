@@ -712,10 +712,10 @@ class phoneAccount extends plugin
             if(isset($this->parent->by_object['user']->givenName) && isset($this->parent->by_object['user']->sn)){
               $tCallerId = $this->parent->by_object['user']->givenName .' '. $this->parent->by_object['user']->sn .' <'. $newnums[$i_new_key] . ">";
               
-              if(strlen($tCallerid) > 80){
+              if(strlen($tCallerId) > 80){
                 $tCallerId = substr($this->parent->by_object['user']->givenName, 0, 1) .' '. $this->parent->by_object['user']->sn .' <'. $newnums[$i_new_key] . ">";
 
-                if(strlen($tCallerid) > 80){
+                if(strlen($tCallerId) > 80){
                   $tCallerId = substr($tCallerId, -80);
                 }
               }
