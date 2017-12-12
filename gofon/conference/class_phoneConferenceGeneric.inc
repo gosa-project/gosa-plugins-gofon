@@ -418,7 +418,7 @@ class conference extends plugin
         /* Connect to current database to be able to add new entries */
         $SQL=array();
         $cfg_Current  = $this->goFonHomeServers[$this->goFonHomeServer] ;
-        $res_cur      =  @mysqli_connect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'],$cfg_Current['DB']);
+        $res_cur      = mysqli_connect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'],$cfg_Current['DB']);
 
         /********************
          * Remove entries that could cause trouble  
@@ -439,17 +439,17 @@ class conference extends plugin
          * We must remove those entries to avoid duplicate use of the same extension name.
          */
         if($this->goFonHomeServer != $this->init_HomeServer){
-            $query = "SELECT id FROM ".$cfg_Current['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($this->telephoneNumber)."' OR exten='".$this->cn."';";
-            $res = @mysqli_query($query,$res_cur);
+            $query = "SELECT id FROM ".$cfg_Current['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($res_cur, $this->telephoneNumber)."' OR exten='".$this->cn."';";
+            $res = mysqli_query($query,$res_cur);
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
             if(!$res){
                 new log("debug","gofonconference/".get_class($this),"",array(),@mysqli_error($res_cur));
-                return(msgPool::dbquery("GOfon", @mysqli_error($res_cur),$cfg_Current['CONNECT_ID']));
+                return(msgPool::dbquery("GOfon", mysqli_error($res_cur),$cfg_Current['CONNECT_ID']));
             }
             if($save && mysqli_affected_rows($res_cur)) {
                 $SQL[] = "DELETE FROM ".$cfg_Current['EXT_TABLE']." 
-                    WHERE   (exten='".mysqli_real_escape_string($this->telephoneNumber)."') 
-                    OR    (exten='".mysqli_real_escape_string($this->cn)."')";
+                    WHERE   (exten='".mysqli_real_escape_string($res_cur, $this->telephoneNumber)."') 
+                    OR    (exten='".mysqli_real_escape_string($res_cur, $this->cn)."')";
             }
         }
 
@@ -563,7 +563,7 @@ class conference extends plugin
                 $s_values = ""; 
                 foreach($valtop as $key=>$val){
                     $s_keys   .="`".$key."`,";
-                    $s_values .="'".mysqli_real_escape_string($val)."',";
+                    $s_values .="'".mysqli_real_escape_string($res_cur, $val)."',";
                 }
                 $s_keys   =preg_replace("/\,$/","",$s_keys); 
                 $s_values =preg_replace("/\,$/","",$s_values); 
@@ -625,10 +625,10 @@ class conference extends plugin
 
         /* Connect to old database */
         $cfg_Init  = $this->goFonHomeServers[$this->init_HomeServer] ;
-        $r_init    =  @mysqli_connect($cfg_Init['CONNECT_ID'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD'], $cfg_Init['DB']);
+        $r_init    = mysqli_connect($cfg_Init['CONNECT_ID'],$cfg_Init['LOGIN'],$cfg_Init['PASSWORD'], $cfg_Init['DB']);
 
         /* Check if there is an old entry */
-        $query = "SELECT id FROM ".$cfg_Init['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($this->old_tele_number)."' OR exten='".mysqli_real_escape_string($this->old_cn)."';";
+        $query = "SELECT id FROM ".$cfg_Init['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($r_init, $this->old_tele_number)."' OR exten='".mysqli_real_escape_string($r_init, $this->old_cn)."';";
         $res = @mysqli_query($query,$r_init);
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         if(!$res){
@@ -639,8 +639,8 @@ class conference extends plugin
         /* There are entries using this cn and/or phone number */
         if($save && mysqli_affected_rows($r_init)) {
             $SQL = "DELETE FROM ".$cfg_Init['EXT_TABLE']." 
-                WHERE   (exten='".mysqli_real_escape_string($this->old_tele_number)."') 
-                OR    (exten='".mysqli_real_escape_string($this->old_cn)."')";
+                WHERE   (exten='".mysqli_real_escape_string($r_init, $this->old_tele_number)."') 
+                OR    (exten='".mysqli_real_escape_string($r_init, $this->old_cn)."')";
 
             /* Query and ensure that everything went fine */
             $res =  @mysqli_query($SQL,$r_init);

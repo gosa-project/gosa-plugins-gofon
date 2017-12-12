@@ -405,9 +405,9 @@ class fonreport extends plugin
 
         $query = "SELECT {$fieldset} FROM cdr ".
             "WHERE   
-            calldate <= ".mysqli_real_escape_string($end)." 
+            calldate <= ".$end." 
             AND 
-            calldate >= ".mysqli_real_escape_string($start)." 
+            calldate >= ".$start." 
             ". $uidstring." 
             ORDER BY ".$this->fields[$this->sort]." $desc";
 

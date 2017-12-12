@@ -194,12 +194,12 @@ class macro extends plugin
         /* Remove current macro from each server available */ 
         if($save){
             foreach($this->goFonHomeServers as $dn => $Server){
-                $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysqli_real_escape_string($context)."';";
-                $r_current  =  @mysqli_connect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
-                $res = @mysqli_query($query,$r_current);
+                $r_current  =  mysqli_connect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
+                $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysqli_real_escape_string($r_current, $context)."';";
+                $res = mysqli_query($query,$r_current);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
                 if(!$res){
-                    new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_current));
+                    new log("debug","gofonmacro/".get_class($this),"",array(),mysqli_error($r_current));
                     @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,"<b>".$query."</b>", "ERROR");
                     trigger_error(mysqli_error($r_current));
                     return(
@@ -237,7 +237,7 @@ class macro extends plugin
 
         /* Macro are spread to each asterisk server */
         foreach($this->goFonHomeServers as $dn => $cfg){
-            $r_con  = @mysqli_connect($cfg['CONNECT_ID'],$cfg['LOGIN'],$cfg['PASSWORD'], $cfg['DB']); 
+            $r_con  = mysqli_connect($cfg['CONNECT_ID'],$cfg['LOGIN'],$cfg['PASSWORD'], $cfg['DB']); 
 
             /************
              * Parse Macro content
@@ -300,11 +300,11 @@ class macro extends plugin
                  *  and add this line to an array that will be inserted 
                  *  to each database.
                  */
-                $context= mysqli_real_escape_string($context);
-                $exten  = mysqli_real_escape_string($tmp[0]);
-                $prio   = mysqli_real_escape_string($tmp[1]);
-                $app    = mysqli_real_escape_string(preg_replace("/\(.*\).*$/","",$tmp[2]));
-                $para   = mysqli_real_escape_string(preg_replace("/^[^(]*\((.*)\)[^)]*$/", "$1", $tmp[2]));
+                $context= mysqli_real_escape_string($r_con, $context);
+                $exten  = mysqli_real_escape_string($r_con, $tmp[0]);
+                $prio   = mysqli_real_escape_string($r_con, $tmp[1]);
+                $app    = mysqli_real_escape_string($r_con, preg_replace("/\(.*\).*$/","",$tmp[2]));
+                $para   = mysqli_real_escape_string($r_con, preg_replace("/^[^(]*\((.*)\)[^)]*$/", "$1", $tmp[2]));
                 $sql.= " ('".$context."','".$exten."','".$prio."','".$app."','".$para."'),";
             }
 

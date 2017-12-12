@@ -345,7 +345,7 @@ class phoneAccount extends plugin
                 (isset($cur_cfg['LOGIN']))&&
                 (isset($cur_cfg['PASSWORD']))){
 
-            $r_con =  @mysqli_connect($cur_cfg['CONNECT_ID'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD'],$cur_cfg['DB']);
+            $r_con = mysqli_connect($cur_cfg['CONNECT_ID'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD'],$cur_cfg['DB']);
             if($r_con){
 
                 $query_tmp = "SELECT ".$cur_cfg['VOICE_TABLE'].".context as 'v_context', 
@@ -353,8 +353,8 @@ class phoneAccount extends plugin
                     ".$cur_cfg['VOICE_TABLE'].".password 
                         FROM  ".$cur_cfg['VOICE_TABLE'].", 
                     ".$cur_cfg['SIP_TABLE']." 
-                        WHERE ".$cur_cfg['VOICE_TABLE'].".mailbox = ".mysqli_real_escape_string($num)." 
-                        AND ".$cur_cfg['SIP_TABLE'].".name='".mysqli_real_escape_string($this->uid)."'";
+                        WHERE ".$cur_cfg['VOICE_TABLE'].".mailbox = ".mysqli_real_escape_string($r_con, $num)." 
+                        AND ".$cur_cfg['SIP_TABLE'].".name='".mysqli_real_escape_string($r_con, $this->uid)."'";
                 $res = mysqli_query($query_tmp);
                 $vp  = mysqli_fetch_assoc($res);
                 if(!isset($vp['context'])){
@@ -408,7 +408,7 @@ class phoneAccount extends plugin
                  */
                 $inno_tables = array("SIP_TABLE","EXT_TABLE","VOICE_TABLE","QUEUE_TABLE","QUEUE_MEMBER_TABLE"); 
                 foreach($inno_tables as $inno_table){
-                    $sql = "show table status like '".mysqli_real_escape_string($config[$inno_table])."';";
+                    $sql = "show table status like '".mysqli_real_escape_string($r_con, $config[$inno_table])."';";
                     $res = mysqli_query($sql);
                     $vp  = mysqli_fetch_assoc($res);
                     if(!preg_match("/^InnoDB$/i",$vp['Engine'])){
@@ -638,7 +638,7 @@ class phoneAccount extends plugin
                             WARNING_DIALOG);
                 }
 
-                $query  = "SELECT id,name,callerid FROM ".$a_Remove['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($this->uid)."';";
+                $query  = "SELECT id,name,callerid FROM ".$a_Remove['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($old_connection, $this->uid)."';";
                 $rid    = mysqli_query($query,$old_connection);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, 
                         "<i>Reguest callerid to be able to identify the user.</i>");
@@ -652,11 +652,11 @@ class phoneAccount extends plugin
                        Strict disallows the addition of entries that do not match the targets field length.
                      */
                     $query_a[]= "SET @@sql_mode = STRICT_ALL_TABLES;";
-                    $query_a[]= "DELETE FROM ".$a_Remove['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($this->uid)."';";
-                    $query_a[]= "DELETE FROM ".$a_Remove['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($result['callerid'])."';";
-                    $query_a[]= "DELETE FROM ".$a_Remove['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($this->uid)."';";
+                    $query_a[]= "DELETE FROM ".$a_Remove['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($old_connection, $this->uid)."';";
+                    $query_a[]= "DELETE FROM ".$a_Remove['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($old_connection, $result['callerid'])."';";
+                    $query_a[]= "DELETE FROM ".$a_Remove['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($old_connection, $this->uid)."';";
                     foreach($oldnums as $s_telenums) {
-                        $query_a[]= "DELETE FROM ".$a_Remove['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($s_telenums)."';";
+                        $query_a[]= "DELETE FROM ".$a_Remove['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($old_connection, $s_telenums)."';";
                     }
 
                     /* Start transaction, to be able to rollback 
@@ -733,7 +733,7 @@ class phoneAccount extends plugin
              */
             $SQL_query_array[] = "SET @@sql_mode = STRICT_ALL_TABLES;";
 
-            $query = "SELECT * FROM ".$a_New['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($this->uid)."';\n"; 
+            $query = "SELECT * FROM ".$a_New['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($new_connection, $this->uid)."';\n"; 
             $rid = mysqli_query($query,$new_connection);
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Receive current mysql entries.");
             if(mysqli_affected_rows($new_connection)){
@@ -760,10 +760,10 @@ class phoneAccount extends plugin
                 if(count($sip_data_array)){
                     $query = "UPDATE ".$a_New['SIP_TABLE']." SET ";
                     foreach($sip_data_array as $key => $val){
-                        $query.= "".$key."='".mysqli_real_escape_string($val)."',"; 
+                        $query.= "".$key."='".mysqli_real_escape_string($new_connection, $val)."',"; 
                     } 
                     $query = preg_replace("/,$/","",$query);
-                    $query.= " WHERE name='".mysqli_real_escape_string($this->uid)."';";
+                    $query.= " WHERE name='".mysqli_real_escape_string($new_connection, $this->uid)."';";
                     $SQL_query_array[] = $query;
                 }
             } else {
@@ -812,7 +812,7 @@ class phoneAccount extends plugin
                  */
                 foreach($sip_data_array as $s_sip_key=>$s_sip_val){
                     if($s_sip_val === NULL) continue;
-                    $s_sip_values.="'".mysqli_real_escape_string($s_sip_val)."',";
+                    $s_sip_values.="'".mysqli_real_escape_string($new_connection, $s_sip_val)."',";
                     $s_sip_keys  .="`".$s_sip_key."`,";
                 }
                 $s_sip_values =  preg_replace("/,$/","",$s_sip_values);
@@ -828,7 +828,7 @@ class phoneAccount extends plugin
              **********************/
 
             $customer_id = $newnums[$i_new_key];
-            $query  = "SELECT id,name,callerid FROM ".$a_New['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($this->uid)."';";
+            $query  = "SELECT id,name,callerid FROM ".$a_New['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($new_connection, $this->uid)."';";
             $rid    = mysqli_query($query,$new_connection);
 
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Receive callerid");
@@ -850,7 +850,7 @@ class phoneAccount extends plugin
             $voice_data_array['pager']   = $this->pager;
 
             /* Check if there is already an entry in sip_users for this uid */
-            $query_tmp = "SELECT * FROM ".$a_New['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($old_customer_id)."';\n";
+            $query_tmp = "SELECT * FROM ".$a_New['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($new_connection, $old_customer_id)."';\n";
             $rid = mysqli_query($query_tmp,$new_connection);
 
             @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query_tmp, "Check if voicemail entry exists");
@@ -876,7 +876,7 @@ class phoneAccount extends plugin
                         $query.= "".$key."='".$val."',"; 
                     } 
                     $query = preg_replace("/,$/","",$query);
-                    $query.= " WHERE customer_id='".mysqli_real_escape_string($old_customer_id)."';";
+                    $query.= " WHERE customer_id='".mysqli_real_escape_string($new_connection, $old_customer_id)."';";
                     $SQL_query_array[] = $query;
                 }
             }else{
@@ -893,7 +893,7 @@ class phoneAccount extends plugin
                 $s_voi_values = $s_voi_keys = "";
                 foreach($voice_data_array as $s_voi_key=>$s_voi_val){
                     if($s_voi_val === NULL) continue;
-                    $s_voi_values.="'".mysqli_real_escape_string($s_voi_val)."',";
+                    $s_voi_values.="'".mysqli_real_escape_string($new_connection, $s_voi_val)."',";
                     $s_voi_keys  .="`".$s_voi_key."`,";
                 }
                 $s_voi_values =  preg_replace("/,$/","",$s_voi_values);
@@ -910,13 +910,13 @@ class phoneAccount extends plugin
 
             /* Initiate transaction 
              */
-            $SQL_query_array[]= "DELETE FROM ".$a_New['EXT_TABLE']." WHERE exten=\"".mysqli_real_escape_string($this->uid)."\";";
+            $SQL_query_array[]= "DELETE FROM ".$a_New['EXT_TABLE']." WHERE exten=\"".mysqli_real_escape_string($new_connection, $this->uid)."\";";
             $oldnums= array();
             foreach($oldnums as $s_telenums){
-                $SQL_query_array[]= "DELETE FROM ".$a_New['EXT_TABLE']." WHERE exten=\"".mysqli_real_escape_string($s_telenums)."\";";
+                $SQL_query_array[]= "DELETE FROM ".$a_New['EXT_TABLE']." WHERE exten=\"".mysqli_real_escape_string($new_connection, $s_telenums)."\";";
             }
             foreach($newnums as $s_telenums){
-                $SQL_query_array[]= "DELETE FROM ".$a_New['EXT_TABLE']." WHERE exten=\"".mysqli_real_escape_string($s_telenums)."\";";
+                $SQL_query_array[]= "DELETE FROM ".$a_New['EXT_TABLE']." WHERE exten=\"".mysqli_real_escape_string($new_connection, $s_telenums)."\";";
             }
 
             /********************** 
@@ -987,7 +987,7 @@ class phoneAccount extends plugin
                 $SQL_syn = preg_replace("/,$/","",$SQL_syn);
                 $SQL_syn .= ") VALUES ("; 
                 foreach($entr as $key2 => $val2){
-                    $SQL_syn .= "'".mysqli_real_escape_string($val2)."',";
+                    $SQL_syn .= "'".mysqli_real_escape_string($new_connection, $val2)."',";
                 }
                 $SQL_syn = preg_replace("/,$/","",$SQL_syn);
                 $SQL_syn .=");\n";
@@ -1664,11 +1664,11 @@ class phoneAccount extends plugin
             if(!$first_num){
                 $first_num = $s_telenums;
             }
-            $SQL[] = "DELETE FROM ".$a_SETUP['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($s_telenums)."';\n";
+            $SQL[] = "DELETE FROM ".$a_SETUP['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($r_con, $s_telenums)."';\n";
         }
 
 
-        $query  = "SELECT id,name,callerid FROM ".$a_SETUP['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($this->uid)."';";
+        $query  = "SELECT id,name,callerid FROM ".$a_SETUP['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($r_con, $this->uid)."';";
         $rid    = mysqli_query($query,$r_con);
         @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
         $result = mysqli_fetch_assoc($rid);
@@ -1680,9 +1680,9 @@ class phoneAccount extends plugin
         /* Set mode to strict
            Strict disallows the addition of entries that do not match the targets field length.
          */
-        $SQL[] = "DELETE FROM ".$a_SETUP['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($callerid)."';";
-        $SQL[] = "DELETE FROM ".$a_SETUP['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($this->uid)."';\n";
-        $SQL[] = "DELETE FROM ".$a_SETUP['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($this->uid)."';\n";
+        $SQL[] = "DELETE FROM ".$a_SETUP['VOICE_TABLE']." WHERE customer_id='".mysqli_real_escape_string($r_con, $callerid)."';";
+        $SQL[] = "DELETE FROM ".$a_SETUP['EXT_TABLE']." WHERE exten='".mysqli_real_escape_string($r_con, $this->uid)."';\n";
+        $SQL[] = "DELETE FROM ".$a_SETUP['SIP_TABLE']." WHERE name='".mysqli_real_escape_string($r_con, $this->uid)."';\n";
 
         /* Start transaction, to be able to rollback
          */
