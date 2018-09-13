@@ -167,7 +167,7 @@ class macro extends plugin
          * Check all home server
          ********************/
         foreach($this->goFonHomeServers as $goFonHomeServer => $cfg_Current){
-            $r_current    =  @mysqli_connect($cfg_Current['CONNECT_ID'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
+            $r_current    =  @mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
             if(mysqli_connect_error($r_current)){
               new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_current));
               return ( msgPool::dbconnect("GOfon",@mysqli_error(),$cfg_Current['SERVER'].":".$cfg_Current['DB']));
@@ -194,7 +194,7 @@ class macro extends plugin
         /* Remove current macro from each server available */ 
         if($save){
             foreach($this->goFonHomeServers as $dn => $Server){
-                $r_current  =  mysqli_connect($Server['CONNECT_ID'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
+                $r_current  =  mysqli_connect($Server['SERVER'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
                 $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysqli_real_escape_string($r_current, $context)."';";
                 $res = mysqli_query($r_current, $query);
                 @DEBUG (DEBUG_MYSQL, __LINE__, __FUNCTION__, __FILE__,$query, "Database query");
@@ -237,7 +237,7 @@ class macro extends plugin
 
         /* Macro are spread to each asterisk server */
         foreach($this->goFonHomeServers as $dn => $cfg){
-            $r_con  = mysqli_connect($cfg['CONNECT_ID'],$cfg['LOGIN'],$cfg['PASSWORD'], $cfg['DB']); 
+            $r_con  = mysqli_connect($cfg['SERVER'],$cfg['LOGIN'],$cfg['PASSWORD'], $cfg['DB']); 
 
             /************
              * Parse Macro content

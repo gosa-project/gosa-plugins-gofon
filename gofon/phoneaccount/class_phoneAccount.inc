@@ -148,7 +148,7 @@ class phoneAccount extends plugin
                 }    
                 $cur_cfg = $this->goFonHomeServers[$this->goFonHomeServer];
 
-                $r_con =  @mysqli_connect($cur_cfg['CONNECT_ID'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD'], $cur_cfg['DB']);
+                $r_con =  @mysqli_connect($cur_cfg['SERVER'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD'], $cur_cfg['DB']);
                 if(!$r_con){
                     new log("debug","gofonreport/".get_class($this),"",array(),@mysqli_error());
                 }
@@ -345,7 +345,7 @@ class phoneAccount extends plugin
                 (isset($cur_cfg['LOGIN']))&&
                 (isset($cur_cfg['PASSWORD']))){
 
-            $r_con = mysqli_connect($cur_cfg['CONNECT_ID'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD'],$cur_cfg['DB']);
+            $r_con = mysqli_connect($cur_cfg['SERVER'],$cur_cfg['LOGIN'],$cur_cfg['PASSWORD'],$cur_cfg['DB']);
             if($r_con){
 
                 $query_tmp = "SELECT ".$cur_cfg['VOICE_TABLE'].".context as 'v_context', 
@@ -401,7 +401,7 @@ class phoneAccount extends plugin
                 (isset($config['LOGIN']))&&
                 (isset($config['PASSWORD']))){
 
-            $r_con =  @mysqli_connect($config['CONNECT_ID'],$config['LOGIN'],$config['PASSWORD'], $config['DB']);
+            $r_con =  @mysqli_connect($config['SERVER'],$config['LOGIN'],$config['PASSWORD'], $config['DB']);
             if($r_con){
 
                 /* Validate Table Type - it must be InnoDB to be able to use transactions 
@@ -590,7 +590,7 @@ class phoneAccount extends plugin
          * Get configuration to old asterisk home server 
          */ 
         $a_New = $this->goFonHomeServers[$this->goFonHomeServer];  // DB Configuration
-        $new_connection =  @mysqli_connect($a_New['CONNECT_ID'],$a_New['LOGIN'],$a_New['PASSWORD'], $a_New['DB']);
+        $new_connection =  @mysqli_connect($a_New['SERVER'],$a_New['LOGIN'],$a_New['PASSWORD'], $a_New['DB']);
         if(!$new_connection){
             $this->generate_error =  msgPool::dbconnect($a_New['SERVER'],@mysqli_error($new_connection),
                     _("Abort saving entries to keep the database consistent."));
@@ -608,7 +608,7 @@ class phoneAccount extends plugin
 
             /* Create connection to the database that contains the old entry. 
              */
-            $old_connection =  @mysqli_connect($a_Remove['CONNECT_ID'],$a_Remove['LOGIN'],$a_Remove['PASSWORD']);
+            $old_connection =  @mysqli_connect($a_Remove['SERVER'],$a_Remove['LOGIN'],$a_Remove['PASSWORD']);
             if(!$old_connection){
                 $this->generate_error =  msgPool::dbconnect($a_Remove['SERVER'],@mysqli_error($old_connection),
                         _("Abort saving entries to keep the database consistent."));
@@ -1646,7 +1646,7 @@ class phoneAccount extends plugin
         }
 
         // Connect to DB server
-        $r_con =  @mysqli_connect($a_SETUP['CONNECT_ID'],$a_SETUP['LOGIN'],$a_SETUP['PASSWORD'], $a_SETUP['DB']);
+        $r_con =  @mysqli_connect($a_SETUP['SERVER'],$a_SETUP['LOGIN'],$a_SETUP['PASSWORD'], $a_SETUP['DB']);
 
         // Check if we are  connected correctly
         if(!$r_con){
