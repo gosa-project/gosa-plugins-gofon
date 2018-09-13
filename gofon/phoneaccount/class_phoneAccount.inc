@@ -32,6 +32,7 @@ class phoneAccount extends plugin
     var $goFonHomeServer        = "0";            // Contains the dn of the server that manage this account 
     var $init_HomeServer        = "0";            // Contains the dn of the server that manage this account 
     var $goFonHomeServers       = array();        // Contains all available server configurations 
+    var $goFonForwarding        = array();
 
     var $context                = "default";
     var $sip_contexts           = array();
@@ -43,7 +44,7 @@ class phoneAccount extends plugin
             "hardware_list","used_hardware");
 
     var $attributes             = array("goFonDeliveryMode", "goFonFormat","goFonHomeServer",
-            "goFonHardware","goFonPIN","goFonVoicemailPIN","telephoneNumber", "goFonMacro","macro");
+            "goFonHardware","goFonPIN","goFonVoicemailPIN","telephoneNumber", "goFonMacro","macro", "goFonForwarding");
     var $objectclasses= array("goFonAccount");
 
     var $uid;
