@@ -609,7 +609,7 @@ class phoneAccount extends plugin
 
             /* Create connection to the database that contains the old entry. 
              */
-            $old_connection =  @mysqli_connect($a_Remove['SERVER'],$a_Remove['LOGIN'],$a_Remove['PASSWORD']);
+            $old_connection =  @mysqli_connect($a_Remove['SERVER'],$a_Remove['LOGIN'],$a_Remove['PASSWORD'],$a_Remove['DB']);
             if(!$old_connection){
                 $this->generate_error =  msgPool::dbconnect($a_Remove['SERVER'],@mysqli_error($old_connection),
                         _("Abort saving entries to keep the database consistent."));
