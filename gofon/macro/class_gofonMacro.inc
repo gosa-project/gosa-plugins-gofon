@@ -167,11 +167,13 @@ class macro extends plugin
          * Check all home server
          ********************/
         foreach($this->goFonHomeServers as $goFonHomeServer => $cfg_Current){
-            $r_current    =  @mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
+            $r_current  =  mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
             if(mysqli_connect_error($r_current)){
               new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_current));
               return ( msgPool::dbconnect("GOfon",@mysqli_error(),$cfg_Current['SERVER'].":".$cfg_Current['DB']));
             }
+
+            $r_current->close();
         }
     }
 
