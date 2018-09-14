@@ -196,11 +196,6 @@ class macro extends plugin
         /* Remove current macro from each server available */ 
         if($save){
             foreach($this->goFonHomeServers as $dn => $Server){
-              if(!$this->modificationAllowed($Server['SERVER'])){
-                msg_dialog::display(_("Modification stopped!"), "Die Makro Einstellungen wurden für den Server ".$Server['SERVER']." nicht akualisiert, da dieser momentan noch migriert wird!", WARNING_DIALOG);
-                continue;
-              }
-
                 $r_current  =  mysqli_connect($Server['SERVER'],$Server['LOGIN'],$Server['PASSWORD'], $Server['DB']);
                 $query      = "DELETE FROM ".$Server['EXT_TABLE']." WHERE context='".mysqli_real_escape_string($r_current, $context)."';";
                 $res = mysqli_query($r_current, $query);
@@ -244,11 +239,6 @@ class macro extends plugin
 
         /* Macro are spread to each asterisk server */
         foreach($this->goFonHomeServers as $dn => $cfg){
-          if(!$this->modificationAllowed($cfg['SERVER'])){
-            msg_dialog::display(_("Modification stopped!"), "Die Makro Einstellungen wurden für den Server ".$cfg['SERVER']." nicht akualisiert, da dieser momentan noch migriert wird!", WARNING_DIALOG);
-            continue;
-          }
-
             $r_con  = mysqli_connect($cfg['SERVER'],$cfg['LOGIN'],$cfg['PASSWORD'], $cfg['DB']); 
 
             /************
@@ -342,18 +332,6 @@ class macro extends plugin
         }
     }
 
-    function modificationAllowed($cn)
-    {
-      $file = CONFIG_DIR."/asterisk/server_migration_cns.conf";
-      if(file_exists($file) && is_readable($file)){
-        foreach(file($file) as $server){
-          if(strtolower(trim($server)) == strtolower(trim($cn))){
-            return(False);
-          }
-        }
-      }
-      return(True);
-    }
 
     function save_object()
     {
