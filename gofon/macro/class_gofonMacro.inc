@@ -167,11 +167,6 @@ class macro extends plugin
          * Check all home server
          ********************/
         foreach($this->goFonHomeServers as $goFonHomeServer => $cfg_Current){
-          if(!$this->modificationAllowed($cfg_Current['SERVER'])){
-            msg_dialog::display(_("Modification stopped!"), "Die Makro Einstellungen wurden für den Server ".$cfg_Current['SERVER']." nicht akualisiert, da dieser momentan noch migriert wird!", WARNING_DIALOG);
-            continue;
-          }
-
             $r_current  =  mysqli_connect($cfg_Current['SERVER'],$cfg_Current['LOGIN'],$cfg_Current['PASSWORD'], $cfg_Current['DB']);
             if(mysqli_connect_error($r_current)){
               new log("debug","gofonmacro/".get_class($this),"",array(),@mysqli_error($r_current));
