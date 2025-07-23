@@ -64,5 +64,5 @@ class goFonMacro extends management
         parent::__construct($config, $ui, "macros", $headpage);
     }
 } 
-// vim:tabstop=2:expandtab:shiftwidth=2:filetype=php:syntax:ruler:
+
 ?>

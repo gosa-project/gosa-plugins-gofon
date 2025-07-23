@@ -821,7 +821,7 @@ class phonequeue extends plugin
         }
 
         if (!$ldap->success()){
-            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, get_class()));
+            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, __CLASS__));
         }
 
         /* Optionally execute a command after we're done */
@@ -876,7 +876,7 @@ class phonequeue extends plugin
         $ldap->modify ($this->attrs); 
         new log("remove","ogroups/".get_class($this),$this->dn,array_keys($this->attrs),$ldap->get_error());
         if (!$ldap->success()){
-            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, get_class()));
+            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, __CLASS__));
         }
     }
 
@@ -911,7 +911,7 @@ class phonequeue extends plugin
                     "plRequirements"=> array(
                         'activePlugin' => 'phoneAccount',
                         'ldapSchema' => array('goFonQueue' => '>=2.7'),
-                        'onFailureDisablePlugin' => array(get_class())
+                        'onFailureDisablePlugin' => array(__CLASS__)
                         ),
                     "plProvidedAcls"=> array(
 
@@ -946,5 +946,5 @@ class phonequeue extends plugin
 
 }
 
-// vim:tabstop=2:expandtab:shiftwidth=2:filetype=php:syntax:ruler:
+
 ?>

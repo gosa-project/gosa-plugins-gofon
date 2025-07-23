@@ -480,7 +480,7 @@ class macro extends plugin
         $ldap->rmDir($this->dn);
         new log("remove","gofonmacro/".get_class($this),$this->dn,array_keys($this->attrs),$ldap->get_error()); 
         if (!$ldap->success()){
-            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, LDAP_DEL, get_class()));
+            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, LDAP_DEL, __CLASS__));
         }
 
         /* Delete references to object groups */
@@ -491,7 +491,7 @@ class macro extends plugin
             unset($og->member[$this->dn]);
             $og->save ();
             if (!$ldap->success()){
-                msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, get_class()));
+                msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, __CLASS__));
             }
         }
     }
@@ -528,7 +528,7 @@ class macro extends plugin
             $this->handle_post_events("add");
         }
         if (!$ldap->success()){
-            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, get_class()));
+            msg_dialog::display(_("LDAP error"), msgPool::ldaperror($ldap->get_error(), $this->dn, 0, __CLASS__));
         }
 
         /* Log last action */
@@ -571,7 +571,7 @@ class macro extends plugin
                     "plSection"     => array("administration"),
                     "plRequirements"=> array(
                         'ldapSchema' => array('goFonMacro' => '>=2.7'),
-                        'onFailureDisablePlugin' => array(get_class(),'phoneAccount','phoneConferenceManagment','goFonMacro')
+                        'onFailureDisablePlugin' => array(__CLASS__,'phoneAccount','phoneConferenceManagment','goFonMacro')
                         ),
                     "plCategory"    => array("gofonmacro" => array("description" => _("GOfon macro"),
                             "objectClass" => "goFonMacro")),
@@ -603,5 +603,5 @@ class macro extends plugin
     }
 
 }
-// vim:tabstop=2:expandtab:shiftwidth=2:filetype=php:syntax:ruler:
+
 ?>
